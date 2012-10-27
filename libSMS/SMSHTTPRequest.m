@@ -294,7 +294,7 @@ static SEL defaultResponseHandlerSelector = nil;
 		if (bodyData != nil)
 			[request setHTTPBody:bodyData];
 		
-		NSString *contentLength = [NSString stringWithFormat:@"%lu", [bodyData length]];
+		NSString *contentLength = [NSString stringWithFormat:@"%u", [bodyData length]];
 		[request setValue:contentLength forHTTPHeaderField:@"Content-Length"];
 	}
 	
