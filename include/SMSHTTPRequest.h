@@ -56,8 +56,7 @@ typedef enum SMSContentType {
     SMSContentTypeDefault,
     SMSContentTypeText,
     SMSContentTypeBinary,
-    SMSContentTypeJSON,
-    SMSContentTypeXML
+    SMSContentTypeJSON
 } SMSContentType;
 
 
@@ -110,6 +109,7 @@ typedef enum SMSContentType {
 @property (nonatomic) NSURLRequestCachePolicy cachePolicy;
 @property (nonatomic) NSTimeInterval timeout;
 @property (nonatomic) BOOL ignoreCertificateWarnings;
+@property (nonatomic, readonly) NSDictionary *responseHTTPHeaders;
 @property (nonatomic) NSInteger statusCode;
 @property (nonatomic, readonly) NSUInteger responseLength;
 @property (nonatomic) BOOL ignoreData;
