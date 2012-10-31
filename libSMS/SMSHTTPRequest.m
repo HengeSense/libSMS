@@ -417,6 +417,7 @@ static SEL defaultResponseHandlerSelector = nil;
 			responseContentType = SMSContentTypeXML;
     }
     
+	responseHTTPHeaders = [response allHeaderFields];
     statusCode = [response statusCode];
     responseLength = [[[response allHeaderFields] valueForKey:@"Content-Length"] intValue];
 	if (SMSLoggingEnabled)
