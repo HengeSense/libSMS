@@ -56,7 +56,8 @@ typedef enum SMSContentType {
     SMSContentTypeDefault,
     SMSContentTypeText,
     SMSContentTypeBinary,
-    SMSContentTypeJSON
+    SMSContentTypeJSON,
+    SMSContentTypeXML
 } SMSContentType;
 
 

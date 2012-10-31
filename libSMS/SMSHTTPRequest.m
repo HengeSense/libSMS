@@ -34,6 +34,7 @@
 #import <UIKit/UIKit.h>
 #import "SMSAlertView.h"
 #import "NSString+UUID.h"
+#import "DDXML.h"
 
 
 NSString *const SMSHTTPRequestKey = @"SMSHTTPRequestKey";
@@ -275,6 +276,14 @@ static SEL defaultResponseHandlerSelector = nil;
 				[request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
 			} break;
                 
+			case SMSContentTypeXML:
+			{
+				if (SMSLoggingEnabled)
+					NSLog(@"SMSHTTPRequest: xml = %@", [(DDXMLDocument *)body XMLStringWithOptions:DDXMLNodePrettyPrint]);
+				bodyData = [(DDXMLDocument *)body XMLData];
+				[request setValue:@"text/xml; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
+			} break;
+                
 			default:
 			{
 				if ([body isKindOfClass:[NSData class]])
@@ -285,7 +294,7 @@ static SEL defaultResponseHandlerSelector = nil;
 		if (bodyData != nil)
 			[request setHTTPBody:bodyData];
 		
-		NSString *contentLength = [NSString stringWithFormat:@"%u", [bodyData length]];
+		NSString *contentLength = [NSString stringWithFormat:@"%lu", [bodyData length]];
 		[request setValue:contentLength forHTTPHeaderField:@"Content-Length"];
 	}
 	
@@ -300,6 +309,12 @@ static SEL defaultResponseHandlerSelector = nil;
 		case SMSContentTypeJSON:
         {
 			[request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+			[request setValue:@"utf-8" forHTTPHeaderField:@"Accept-Charset"];
+        } break;
+            
+		case SMSContentTypeXML:
+        {
+			[request setValue:@"text/xml" forHTTPHeaderField:@"Accept"];
 			[request setValue:@"utf-8" forHTTPHeaderField:@"Accept-Charset"];
         } break;
             
@@ -398,9 +413,10 @@ static SEL defaultResponseHandlerSelector = nil;
 			responseContentType = SMSContentTypeText;
 		else if ([contentType rangeOfString:@"application/json" options:NSCaseInsensitiveSearch].location != NSNotFound)
 			responseContentType = SMSContentTypeJSON;
+		else if ([contentType rangeOfString:@"text/xml" options:NSCaseInsensitiveSearch].location != NSNotFound)
+			responseContentType = SMSContentTypeXML;
     }
     
-    responseHTTPHeaders = [response allHeaderFields];
     statusCode = [response statusCode];
     responseLength = [[[response allHeaderFields] valueForKey:@"Content-Length"] intValue];
 	if (SMSLoggingEnabled)
@@ -409,7 +425,7 @@ static SEL defaultResponseHandlerSelector = nil;
 	if ([delegate respondsToSelector:@selector(request:receivedResponseWithStatusCode:)])
 		[delegate request:self receivedResponseWithStatusCode:statusCode];
 	
-    if (httpMethod != SMSHTTPMethodHEAD) {
+	if (httpMethod != SMSHTTPMethodHEAD) {
         if (responseLength <= streamResponseToDiskThreshhold)
             receivedData = [[NSMutableData alloc] init];
         else {
@@ -525,6 +541,18 @@ static SEL defaultResponseHandlerSelector = nil;
                             NSString *prettyString = [[NSString alloc] initWithData:prettyData encoding:NSUTF8StringEncoding];
 							NSLog(@"SMSHTTPRequest: json = %@", prettyString);
                         }
+					} break;
+                        
+					case SMSContentTypeXML:
+					{
+						NSError *error = nil;
+						responseData = [[DDXMLDocument alloc] initWithData:receivedData options:0 error:&error];
+						if (SMSLoggingEnabled) {
+							if (!error)
+								NSLog(@"SMSHTTPRequest: xml = %@", [(DDXMLDocument *)responseData XMLStringWithOptions:DDXMLNodePrettyPrint]);
+							else
+								NSLog(@"SMSHTTPRequest: xml error = %@", error);
+						}
 					} break;
                         
                     default: break;
