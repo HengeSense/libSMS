@@ -36,18 +36,22 @@
 
 - (NSString *)timeAgoString
 {
-	NSTimeInterval delta = fabs([self timeIntervalSinceNow]);
+    NSTimeInterval delta = fabs([self timeIntervalSinceNow]);
 	
-	if (delta >= 86400)
-		return [NSString stringWithFormat:@"%.0f days", delta/86400];
-	else if (delta >= 3600)
-		return [NSString stringWithFormat:@"%.0f hours", delta/3600];
-	else if (delta >= 60)
-		return [NSString stringWithFormat:@"%.0f minutes", delta/60];
-	else if (delta >= 1)
-		return [NSString stringWithFormat:@"%.0f seconds", delta];
-	else
-		return @"moments";
+	if (delta >= 86400) {
+        double dt = delta/86400;
+		return [NSString stringWithFormat:NSLocalizedString(@"%.0f day%@", @"Time ago"), dt, (dt >= 2.0 ? @"s" : @"")];
+    } else if (delta >= 3600) {
+        double dt = delta/3600;
+		return [NSString stringWithFormat:NSLocalizedString(@"%.0f hours", @"Time ago"), dt, (dt >= 2.0 ? @"s" : @"")];
+    } else if (delta >= 60) {
+        double dt = delta/60;
+		return [NSString stringWithFormat:NSLocalizedString(@"%.0f minutes", @"Time ago"), dt, (dt >= 2.0 ? @"s" : @"")];
+	} else if (delta >= 1) {
+		return [NSString stringWithFormat:NSLocalizedString(@"%.0f seconds", @"Time ago"), delta];
+	} else {
+		return NSLocalizedString(@"moments", @"Time ago");
+    }
 }	
 
 @end
