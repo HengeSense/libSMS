@@ -294,7 +294,7 @@ static SEL defaultResponseHandlerSelector = nil;
 		if (bodyData != nil)
 			[request setHTTPBody:bodyData];
 		
-		NSString *contentLength = [NSString stringWithFormat:@"%lu", [bodyData length]];
+		NSString *contentLength = [NSString stringWithFormat:@"%u", [bodyData length]];
 		[request setValue:contentLength forHTTPHeaderField:@"Content-Length"];
 	}
 	
@@ -549,10 +549,9 @@ static SEL defaultResponseHandlerSelector = nil;
 						NSError *error = nil;
 						responseData = [[DDXMLDocument alloc] initWithData:receivedData options:0 error:&error];
 						if (SMSLoggingEnabled) {
-							if (!error)
-								NSLog(@"SMSHTTPRequest: xml = %@", [(DDXMLDocument *)responseData XMLStringWithOptions:DDXMLNodePrettyPrint]);
-							else
-								NSLog(@"SMSHTTPRequest: xml error = %@", error);
+                            NSLog(@"SMSHTTPRequest: xml = %@", [(DDXMLDocument *)responseData XMLStringWithOptions:DDXMLNodePrettyPrint]);
+							if (error)
+                                NSLog(@"SMSHTTPRequest: xml error = %@", error);
 						}
 					} break;
                         
